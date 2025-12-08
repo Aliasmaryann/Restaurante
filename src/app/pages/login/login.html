@@ -1,8 +1,29 @@
-<p>login works!</p>
 
-<div 
-  class="min-h-screen bg-cover bg-center flex justify-center items-center"
-  style="background-image: url('assets/images/cocina.webp');">
+<div class="relative min-h-screen w-full">
+
+  <!-- Galleria de fondo -->
+  <div class="absolute inset-0">
+    <p-galleria
+      [value]="images"
+      [showThumbnails]="false"
+      [showItemNavigators]="false"
+      [autoPlay]="true"
+      [circular]="true"
+      [transitionInterval]="4000"
+      [containerStyle]="{ width: '100%', height: '100%' }"
+    >
+      <ng-template #item let-item>
+        <img [src]="item.itemImageSrc" class="w-full h-full object-cover filter brightness-75"/>
+      </ng-template>
+    </p-galleria>
+  </div>
+
+
+  <!-- Capa oscura semi-transparente para contraste -->
+  <div class="absolute inset-0 bg-black/40"></div>
+
+
+    <div class="absolute inset-0 flex justify-center items-center p-4">
     <p-card class="w-[400px]">
     <span class="text-3xl font-semibold text-blue-900 flex justify-center mb-10">
         Iniciar Sesión
@@ -34,8 +55,10 @@
             </div>
         </div>
             <div class="ml-auto flex justify-start ">
-                <p-checkbox inputId="recuerda" name="recordarme" size="small"/>
-                <label for="recuerda" class="ml-3 text-sm">Recordar mis datos </label>
+                <p-checkbox inputId="recuerda" [(ngModel)]="checked" binary="true" name="recordarme" size="small"/>
+                <label for="recuerda" class="ml-3 text-sm cursor-pointer">
+                    Recordar mis datos
+                </label>
             </div>
             <div class="ml-auto flex justify-center mt-4">
                 <p class="text-sm text-blue-600 hover:underline cursor-pointer " >
@@ -53,6 +76,7 @@
 
     </form>
     </p-card>
+    </div>
 </div>
 
 
