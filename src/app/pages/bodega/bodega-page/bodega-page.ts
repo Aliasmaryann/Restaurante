@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-bodega-page',
-  standalone: false,
+  standalone: true,
   templateUrl: './bodega-page.html',
   styleUrl: './bodega-page.css',
 })

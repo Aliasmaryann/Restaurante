@@ -6,12 +6,11 @@ import { BodegaPageRoutingModule } from './bodega-page-routing-module';
 
 
 @NgModule({
-  declarations: [
-    BodegaPage
-  ],
+  declarations: [],
   imports: [
     CommonModule,
-    BodegaPageRoutingModule
+    BodegaPageRoutingModule,
+    BodegaPage
   ]
 })
 export class BodegaPageModule { }

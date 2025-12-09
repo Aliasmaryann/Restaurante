@@ -32,13 +32,13 @@
         <p-avatar icon="pi pi-user" class="mb-5" size="xlarge" shape="circle" />
 
     </div>
-    <form (ngSubmit)="login()">
+    <form (ngSubmit)="onLogin()">
         <div class="grid grid-cols-12 gap-2 w-full mt-4">
             <!-- Usuario -->
             <div class="col-span-12 mb-5">
                 <p-floatlabel variant="on">
                     <p-iconfield>
-                        <input label="Username" id="username" pInputText class="w-full" />
+                        <input label="Username" id="username" [(ngModel)]="username" name="username" pInputText class="w-full" />
                         <p-inputicon class="pi pi-user" />
                     </p-iconfield>
                     <label for="username">Username</label> 
@@ -49,7 +49,7 @@
             <!-- Contraseña -->
             <div class="col-span-12 mb-5">
             <p-floatlabel variant="on">
-                    <p-password id="password" [feedback]="false" fluid [toggleMask]="true"/>
+                    <p-password id="password" [(ngModel)]="password" name="password" required [feedback]="false" fluid [toggleMask]="true"/>
                     <label for="password">Password</label>
                 </p-floatlabel>
             </div>
@@ -69,7 +69,7 @@
         <!-- Botón -->
         <div class="ml-auto flex justify-center mt-4">
             
-            <button pButton id="entrar" label="INGRESAR" class="w-" severity="success"></button>
+            <button pButton id="entrar" label="INGRESAR" type="submit" class="w-" severity="success"></button>
         </div>
         
         
