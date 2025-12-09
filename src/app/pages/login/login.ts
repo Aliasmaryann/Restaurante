@@ -49,9 +49,9 @@ export class LoginPages {
 
         // Redirigir según rol
         if (role === 'admin') {
-          this.router.navigate(['/admin']);
-        } else if (role === 'trabajador') {
           this.router.navigate(['/bodega-page']);
+        } else if (role === 'trabajador') {
+          this.router.navigate(['/admin']);
         } else if (role === 'cliente') {
           this.router.navigate(['/cliente']);
         }

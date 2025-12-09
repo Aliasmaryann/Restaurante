@@ -1,1 +1,44 @@
 <p>bodega-page works!</p>
+
+<div class="p-grid">
+  <!-- Panel lateral -->
+  <div class="p-col-12 p-md-3">
+    <p-panel header="Menú Bodega">
+      <ul>
+        <li><a routerLink="/productos">📦 Productos</a></li>
+        <li><a routerLink="/stock">📊 Stock</a></li>
+        <li><a routerLink="/entradas">➕ Entradas</a></li>
+        <li><a routerLink="/salidas">➖ Salidas</a></li>
+      </ul>
+    </p-panel>
+  </div>
+
+  <!-- Panel principal -->
+  <div class="p-col-12 p-md-9">
+    <p-panel header="Gestión de Bodega">
+      <p-table [paginator]="true" [rows]="5">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-prod>
+          <tr>
+            <td>{{prod.id}}</td>
+            <td>{{prod.nombre}}</td>
+            <td>{{prod.categoria}}</td>
+            <td>{{prod.stock}}</td>
+            <td>
+              <button pButton type="button" icon="pi pi-pencil" label="Editar"></button>
+              <button pButton type="button" icon="pi pi-trash" label="Eliminar" class="p-button-danger"></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-panel>
+  </div>
+</div>

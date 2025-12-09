@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class Auth {
   private apiUrl = 'http://localhost:3000'; // tu backend Node.js
+  // private apiUrl = 'https://nonlitigious-unmournful-kelvin.ngrok-free.dev/'; // tu backend Node.js
 
   constructor(private http: HttpClient) {}
 
