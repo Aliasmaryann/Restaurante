@@ -1,44 +1,241 @@
 <p>bodega-page works!</p>
 
-<div class="p-grid">
-  <!-- Panel lateral -->
-  <div class="p-col-12 p-md-3">
-    <p-panel header="Menú Bodega">
-      <ul>
-        <li><a routerLink="/productos">📦 Productos</a></li>
-        <li><a routerLink="/stock">📊 Stock</a></li>
-        <li><a routerLink="/entradas">➕ Entradas</a></li>
-        <li><a routerLink="/salidas">➖ Salidas</a></li>
-      </ul>
-    </p-panel>
-  </div>
+<div class="min-h-screen bg-gray-50">
+  <!-- Top header -->
+  <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-blue-900">Gestión de Bodega</h1>
+      <nav class="flex gap-4">
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/dashboard">Dashboard</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/productos">Productos</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/cocina">Cocina</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/configuracion">Configuración</a>
+      </nav>
+    </div>
+  </header>
 
-  <!-- Panel principal -->
-  <div class="p-col-12 p-md-9">
-    <p-panel header="Gestión de Bodega">
-      <p-table [paginator]="true" [rows]="5">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Stock</th>
-            <th>Acciones</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-prod>
-          <tr>
-            <td>{{prod.id}}</td>
-            <td>{{prod.nombre}}</td>
-            <td>{{prod.categoria}}</td>
-            <td>{{prod.stock}}</td>
-            <td>
-              <button pButton type="button" icon="pi pi-pencil" label="Editar"></button>
-              <button pButton type="button" icon="pi pi-trash" label="Eliminar" class="p-button-danger"></button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-panel>
-  </div>
-</div>
+  <!-- Content -->
+  <main class="mx-auto max-w-7xl px-4 py-6">
+    <!-- Metrics cards -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <p class="text-xs uppercase tracking-wide text-gray-500">Total productos</p>
+        <p class="mt-2 text-2xl font-semibold text-gray-900">{{ totales.total }}</p>
+      </div>
+      <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <p class="text-xs uppercase tracking-wide text-gray-500">En stock</p>
+        <p class="mt-2 text-2xl font-semibold text-gray-900">{{ totales.en_stock }}</p>
+      </div>
+      <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <p class="text-xs uppercase tracking-wide text-gray-500">Bajo stock</p>
+        <p class="mt-2 text-2xl font-semibold text-gray-900">{{ totales.bajo_stock }}</p>
+      </div>
+    </section>
+
+    <!-- Toolbar -->
+    <section class="rounded-lg border border-gray-200 bg-white">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between p-4">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-box text-gray-700"></i>
+          <span class="text-xl font-medium text-blue-900">Entradas de stock</span>
+        </div>
+        <div class="flex flex-1 md:flex-none items-center gap-3">
+          <span class="p-input-icon-left w-full md:w-72">
+            <p-iconfield>
+              <input
+                pInputText
+                type="text"
+                class="w-full"
+                placeholder="Buscar Producto"/>
+              <p-inputicon class="pi pi-search" />
+            </p-iconfield>
+          </span>
+          <button
+            pButton
+            type="button"
+            label="Agregar"
+            icon="pi pi-plus"
+            class=""
+            (click)="abrirDialogo()"
+            severity="success"      
+          ></button>
+          <button pButton 
+            label="Eliminar" 
+            icon="pi pi-trash" 
+            severity="danger" 
+            (click)="eliminarSeleccionados()" 
+            [disabled]="selectedRows.length === 0"></button>
+          <button pButton 
+            label="Editar" 
+            icon="pi pi-pencil" 
+            severity="secondary"
+            (click)="abrirDialogoEditar()" 
+            [disabled]="selectedRows.length !== 1"></button>
+        </div>
+      </div>
+
+      <!-- Diálogo -->
+      <p-dialog header="Nueva entrada de bodega" [(visible)]="showDialog" [modal]="true" [style]="{width: '42vw'}">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Fecha</label>
+            <input type="date" [(ngModel)]="nuevaEntrada.fecha" class="mt-1 block w-full border rounded-md p-2" />
+          </div>
+
+          <div>
+            <p-floatLabel>
+              <select id="producto" [(ngModel)]="nuevaEntrada.producto_id" class="w-full border rounded-md p-2">
+                <option [ngValue]="0">Selecciona producto</option>
+                <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.nombre }}</option>
+              </select>
+              
+            </p-floatLabel>
+            </div>
+            <div>
+            <!-- Proveedor -->
+            <p-floatLabel>
+              <select id="proveedor" [(ngModel)]="nuevaEntrada.proveedor_id" class="w-full border rounded-md p-2">
+                <option [ngValue]="0">Selecciona proveedor</option>
+                <option *ngFor="let pr of proveedores" [ngValue]="pr.id">{{ pr.nombre }}</option>
+              </select>
+              
+            </p-floatLabel>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Categoría</label>
+            <input type="text" [(ngModel)]="nuevaEntrada.categoria" class="mt-1 block w-full border rounded-md p-2" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+            <input type="number" [(ngModel)]="nuevaEntrada.cantidad" class="mt-1 block w-full border rounded-md p-2" />
+          </div>
+
+          
+        </div>
+
+        <div class="flex justify-end gap-2 px-4 pb-4">
+          <button pButton label="Guardar" icon="pi pi-check" (click)="guardarEntrada()" severity="success"></button>
+          <button pButton label="Cancelar" icon="pi pi-times" (click)="showDialog=false" severity="secondary"></button>
+        </div>
+      </p-dialog>
+
+      <p-dialog 
+      [header]="editando ? 'Editar entrada de bodega' : 'Nueva entrada de bodega'" 
+      [(visible)]="showDialog" 
+      [modal]="true" 
+      [style]="{width: '42vw'}">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+        <!-- Fecha -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Fecha</label>
+          <input type="date" [(ngModel)]="nuevaEntrada.fecha" class="mt-1 block w-full border rounded-md p-2" />
+        </div>
+
+        <!-- Producto -->
+        <div>
+          <p-floatLabel>
+            <select id="producto" [(ngModel)]="nuevaEntrada.producto_id" class="w-full border rounded-md p-2">
+              <option [ngValue]="0">Selecciona producto</option>
+              <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.nombre }}</option>
+            </select>
+          </p-floatLabel>
+        </div>
+
+        <!-- Proveedor -->
+        <div>
+          <p-floatLabel>
+            <select id="proveedor" [(ngModel)]="nuevaEntrada.proveedor_id" class="w-full border rounded-md p-2">
+              <option [ngValue]="0">Selecciona proveedor</option>
+              <option *ngFor="let pr of proveedores" [ngValue]="pr.id">{{ pr.nombre }}</option>
+            </select>
+          </p-floatLabel>
+        </div>
+
+        <!-- Categoría -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Categoría</label>
+          <input type="text" [(ngModel)]="nuevaEntrada.categoria" class="mt-1 block w-full border rounded-md p-2" />
+        </div>
+
+        <!-- Cantidad -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+          <input type="number" [(ngModel)]="nuevaEntrada.cantidad" class="mt-1 block w-full border rounded-md p-2" />
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-2 px-4 pb-4">
+        <button pButton 
+          [label]="editando ? 'Actualizar' : 'Guardar'" 
+          icon="pi pi-check" 
+          (click)="editando ? editarEntrada() : guardarEntrada()" 
+          severity="success">
+        </button>
+        <button pButton label="Cancelar" icon="pi pi-times" (click)="showDialog=false; editando=false" severity="secondary"></button>
+      </div>
+    </p-dialog>
+
+
+        <!-- Table -->
+      <div class="p-4">
+        <p-table
+          [value]="rows"
+          [paginator]="true"
+          [rows]="10"
+          [(selection)]="selectedRows" 
+          dataKey="id" 
+          [resizableColumns]="true"
+          [showGridlines]="true"
+          [tableStyle]="{ 'min-width': '60rem' }"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th pResizableColumn pSortableColumn="fecha" aria-label="Fecha">Fecha </th>
+              <th pResizableColumn pSortableColumn="producto" aria-label="Producto">Producto </th>
+              <th pResizableColumn pSortableColumn="categoria" aria-label="Categoría">Categoría</th>
+              <th pResizableColumn pSortableColumn="cantidad" aria-label="Cantidad" class="text-right">Cantidad</th>
+              <th pResizableColumn pSortableColumn="proveedor" aria-label="Proveedor">Proveedor</th>
+              <th aria-label="Acciones" class="w-40">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>
+                <p-tableCheckbox [value]="row"></p-tableCheckbox>
+              </td>
+              <td>{{ row.fecha | date:'dd/MM/yyyy' }}</td>
+              <td class="font-medium text-gray-900">{{ row.producto }}</td>
+              <td>{{ row.categoria }}</td>
+              <td class="text-right">{{ row.cantidad }}</td>
+              <td>{{ row.proveedor }}</td>
+              <td class="flex gap-2">
+                
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6">
+                <div class="text-center text-gray-500 py-6">No hay registros.</div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </section>
+   
+    <!-- Add / Edit dialog -->
+    
+     
+        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div> -->
+
