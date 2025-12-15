@@ -133,5 +133,153 @@ app.put('/bodega/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar entrada' });
   }
 });
+
+//
+//clientes
+// Todas las recetas
+
+app.get('/recetas', async (req, res) => {
+  try {
+    const r = await pool.query(`SELECT id, nombre, categoria, precio, descripcion FROM recetas ORDER BY categoria, nombre`);
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener recetas' });
+  }
+});
+
+// Recetas por categoría
+app.get('/recetas/:categoria', async (req, res) => {
+  const { categoria } = req.params;
+  try {
+    const r = await pool.query(
+      `SELECT id, nombre, categoria, precio, descripcion FROM recetas WHERE categoria ILIKE $1 ORDER BY nombre`,
+      [categoria]
+    );
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener recetas por categoría' });
+  }
+});
+
+// Crear pedido
+app.post('/pedidos', async (req, res) => {
+  const { mesa, items } = req.body; 
+  // items = [{ receta_id, cantidad }]
+  try {
+    // Crear pedido
+    const pedido = await pool.query(
+      `INSERT INTO pedidos (mesa, estado) VALUES ($1, 'Pendiente') RETURNING id`,
+      [mesa]
+    );
+    const pedidoId = pedido.rows[0].id;
+
+    // Insertar detalle
+    for (const item of items) {
+      await pool.query(
+        `INSERT INTO detalle_pedido (pedido_id, receta_id, cantidad, precio)
+         SELECT $1, id, $2, precio FROM recetas WHERE id=$3`,
+        [pedidoId, item.cantidad, item.receta_id]
+      );
+    }
+
+    res.json({ success: true, pedidoId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al crear pedido' });
+  }
+});
+
+// Movimientos financieros
+app.get('/finanzas', async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT id, fecha, tipo, descripcion, categoria, monto
+      FROM finanzas
+      ORDER BY fecha DESC
+    `);
+    res.json(r.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener movimientos financieros' });
+  }
+});
+
+// Totales financieros
+app.get('/finanzas/totales', async (req, res) => {
+  try {
+    const ingresos = await pool.query(`
+      SELECT COALESCE(SUM(monto), 0) AS total
+      FROM finanzas
+      WHERE tipo = 'Ingreso'
+    `);
+
+    const egresos = await pool.query(`
+      SELECT COALESCE(SUM(monto), 0) AS total
+      FROM finanzas
+      WHERE tipo = 'Egreso'
+    `);
+
+    const balance =
+      parseFloat(ingresos.rows[0].total) -
+      parseFloat(egresos.rows[0].total);
+
+    res.json({
+      ingresos: ingresos.rows[0].total,
+      egresos: egresos.rows[0].total,
+      balance
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener totales financieros' });
+  }
+});
+// Ingresos vs Egresos
+app.get('/finanzas/resumen', async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT tipo, SUM(monto) AS total
+      FROM finanzas
+      GROUP BY tipo
+    `);
+    res.json(r.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener resumen financiero' });
+  }
+});
+
+app.get('/finanzas/categorias', async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT categoria, SUM(monto) AS total
+      FROM finanzas
+      GROUP BY categoria
+      ORDER BY total DESC
+    `);
+    res.json(r.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener categorías financieras' });
+  }
+});
+// Registrar movimiento financiero
+app.post('/finanzas', async (req, res) => {
+  const { fecha, tipo, descripcion, monto, categoria } = req.body;
+
+  try {
+    const r = await pool.query(`
+      INSERT INTO finanzas (fecha, tipo, descripcion, monto, categoria)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `, [fecha, tipo, descripcion, monto, categoria]);
+
+    res.json(r.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al registrar movimiento' });
+  }
+});
+
+
   
 app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));

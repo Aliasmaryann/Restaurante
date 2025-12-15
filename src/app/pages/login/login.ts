@@ -53,7 +53,7 @@ export class LoginPages {
         } else if (role === 'trabajador') {
           this.router.navigate(['/admin']);
         } else if (role === 'cliente') {
-          this.router.navigate(['/cliente']);
+          this.router.navigate(['/clientes']);
         }
       } else {
         alert('Credenciales inválidas');

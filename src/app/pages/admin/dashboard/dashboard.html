@@ -1,43 +1,115 @@
-<p>dashboard works!</p>
-<div class="p-grid">
-  <!-- Panel lateral -->
-  <div class="p-col-12 p-md-3">
-    <p-panel header="Menú Bodega">
-      <ul>
-        <li><a routerLink="/productos">📦 Productos</a></li>
-        <li><a routerLink="/stock">📊 Stock</a></li>
-        <li><a routerLink="/entradas">➕ Entradas</a></li>
-        <li><a routerLink="/salidas">➖ Salidas</a></li>
-      </ul>
-    </p-panel>
+<header class="sticky top-0 z-30 bg-white border-b border-gray-200">
+      <div class="w-full px-4 py-3 flex items-center justify-between">
+        <h1 class="text-2xl font-semibold text-blue-900">Gestión de Finanzas</h1>
+        <nav class="flex gap-4">
+          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/admin/dashboard">Dashboard</a>
+          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/productos">Productos</a>
+          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/cocina">Cocina</a>
+          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/configuracion">Configuración</a>
+        </nav>
+      </div>
+  </header>
+<!-- Dashboard Finanzas Restaurante - PrimeNG + Tailwind -->
+<div class="grid grid-cols-12 gap-4 p-4">
+
+  <!-- Ingresos -->
+  <div class="col-span-12 md:col-span-4">
+    <p-card class="shadow-lg">
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center gap-2">
+          <i class="pi pi-arrow-up mt-2 ml-2 text-green-500"></i>
+          <span class="text-xl font-semibold">Ingresos</span>
+        </div>
+      </ng-template>
+      <div class="text-center">
+        <p class="text-3xl font-bold text-green-600">
+          {{ ingresos | number:'1.0-0' }}
+        </p>
+        <p class="text-sm text-gray-500">Total del mes</p>
+      </div>
+    </p-card>
   </div>
 
-  <!-- Panel principal -->
-  <div class="p-col-12 p-md-9">
-    <p-panel header="Gestión de Bodega">
-      <p-table [paginator]="true" [rows]="5">
+  <!-- Egresos -->
+  <div class="col-span-12 md:col-span-4">
+    <p-card class="shadow-lg">
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center gap-2">
+          <i class="pi pi-arrow-down mt-2 ml-2 text-red-500"></i>
+          <span class="text-xl font-semibold">Egresos</span>
+        </div>
+      </ng-template>
+      <div class="text-center">
+        <p class="text-3xl font-bold text-red-600">
+          {{ egresos | number:'1.0-0' }}
+        </p>
+        <p class="text-sm text-gray-500">Total del mes</p>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Balance -->
+  <div class="col-span-12 md:col-span-4">
+    <p-card class="shadow-lg">
+      <ng-template pTemplate="header">
+        <div class="flex align-items-center gap-2">
+          <i class="pi pi-wallet mt-2 ml-2 text-blue-500"></i>
+          <span class="text-xl font-semibold">Balance</span>
+        </div>
+      </ng-template>
+      <div class="text-center">
+        <p class="text-3xl font-bold text-blue-600">
+          {{ balance | number:'1.0-0' }}
+        </p>
+        <p class="text-sm text-gray-500">Ganancia neta</p>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Gráfico de Ingresos vs Egresos -->
+  <div class="col-span-12 md:col-span-6">
+    <p-card header="Ingresos vs Egresos" class="shadow-lg">
+      <div class="h-[300px]">
+        <p-chart type="bar" [data]="finanzasBarData" [options]="barChartOptions" class="h-full w-full block"></p-chart>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Gráfico por Categoría -->
+  <div class="col-span-12 md:col-span-6">
+    <p-card header="Distribución por Categoría" class="shadow-lg">
+      <div class="h-[300px]">
+        <p-chart type="pie" [data]="finanzasPieData" [options]="chartOptions"></p-chart>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Tabla de movimientos -->
+  <div class="col-span-12">
+    <p-card header="Movimientos financieros" class="shadow-lg">
+      <p-table [value]="movimientos" [paginator]="true" [rows]="5" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr>
-            <th>ID</th>
-            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
             <th>Categoría</th>
-            <th>Stock</th>
-            <th>Acciones</th>
+            <th>Monto</th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-prod>
+        <ng-template pTemplate="body" let-mov>
           <tr>
-            <td>{{prod.id}}</td>
-            <td>{{prod.nombre}}</td>
-            <td>{{prod.categoria}}</td>
-            <td>{{prod.stock}}</td>
+            <td>{{ mov.fecha }}</td>
             <td>
-              <button pButton type="button" icon="pi pi-pencil" label="Editar"></button>
-              <button pButton type="button" icon="pi pi-trash" label="Eliminar" class="p-button-danger"></button>
+              <p-tag [value]="mov.tipo" [severity]="mov.tipo === 'Ingreso' ? 'success' : 'danger'"></p-tag>
             </td>
+            <td>{{ mov.descripcion }}</td>
+            <td>{{ mov.categoria }}</td>
+            <td class="font-semibold">${{ mov.monto }}</td>
           </tr>
         </ng-template>
       </p-table>
-    </p-panel>
+    </p-card>
   </div>
+
 </div>

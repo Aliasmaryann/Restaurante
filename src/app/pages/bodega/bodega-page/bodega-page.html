@@ -1,12 +1,10 @@
-<p>bodega-page works!</p>
-
 <div class="min-h-screen bg-gray-50">
   <!-- Top header -->
   <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
     <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
       <h1 class="text-2xl font-semibold text-blue-900">Gestión de Bodega</h1>
       <nav class="flex gap-4">
-        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/dashboard">Dashboard</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/admin/dashboard">Dashboard</a>
         <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/productos">Productos</a>
         <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/cocina">Cocina</a>
         <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/configuracion">Configuración</a>
@@ -75,7 +73,7 @@
       </div>
 
       <!-- Diálogo -->
-      <p-dialog header="Nueva entrada de bodega" [(visible)]="showDialog" [modal]="true" [style]="{width: '42vw'}">
+      <p-dialog header="Nueva entrada de bodega" [(visible)]="showDialogNuevo" [modal]="true" [style]="{width: '42vw'}">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Fecha</label>
@@ -123,7 +121,7 @@
 
       <p-dialog 
       [header]="editando ? 'Editar entrada de bodega' : 'Nueva entrada de bodega'" 
-      [(visible)]="showDialog" 
+      [(visible)]="showDialogEditar" 
       [modal]="true" 
       [style]="{width: '42vw'}">
 

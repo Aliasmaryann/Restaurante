@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-// import { NgModule } from '@angular/core';
-// import { BrowserModule } from '@angular/platform-browser';
+
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 // PrimeNG
 import { PanelModule } from 'primeng/panel';
@@ -22,6 +22,7 @@ import { FloatLabel } from "primeng/floatlabel";
   standalone: true,
   imports: [
     PanelModule,
+    RouterModule,
     TableModule,
     RippleModule,
     ButtonModule,
@@ -39,6 +40,8 @@ import { FloatLabel } from "primeng/floatlabel";
 export class BodegaPage implements OnInit {
   rows: any[] = [];
   showDialog: boolean = false;
+  showDialogNuevo: boolean = false;
+  showDialogEditar: boolean = false
 
   productos: { id: number; nombre: string }[] = [];
   proveedores: { id: number; nombre: string }[] = [];
@@ -96,21 +99,21 @@ export class BodegaPage implements OnInit {
       fecha: new Date().toISOString().split('T')[0],
       producto_id: 0, categoria: '', cantidad: 0, proveedor_id: 0
     };
-    this.showDialog = true;
+    this.showDialogNuevo = true;
   }
   abrirDialogoEditar() {
     if (this.selectedRows.length === 1) {
-      this.nuevaEntrada = { ...this.selectedRows[0] }; // clona el registro
+      this.nuevaEntrada = { ...this.selectedRows[0] };
       this.editando = true;
-      this.loadCatalogos(); 
-      this.showDialog = true;
+      this.loadCatalogos();
+      this.showDialogEditar = true;
     }
   }
 
   guardarEntrada() {
     this.http.post('http://localhost:3000/bodega', this.nuevaEntrada).subscribe({
       next: () => {
-        this.showDialog = false;
+        this.showDialogNuevo = false;
         this.loadEntradas();
         this.loadTotales();
         this.cdr.detectChanges(); // fuerza actualización segura
@@ -123,7 +126,7 @@ export class BodegaPage implements OnInit {
     this.http.put(`http://localhost:3000/bodega/${this.nuevaEntrada.id}`, this.nuevaEntrada).subscribe({
       next: () => {
         setTimeout(() => {
-          this.showDialog = false;
+          this.showDialogEditar = false;
           this.editando = false;
           this.selectedRows = [];
           this.loadEntradas();

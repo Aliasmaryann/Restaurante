@@ -1,0 +1,370 @@
+<div class="p-4">
+    <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-blue-900">Menú</h1>
+      <nav class="flex gap-4">
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/dashboard">Sobre Nosotros</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/productos">Reservas</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/configuracion">Configuración</a>
+      </nav>
+      <p-button 
+        label="Ver carrito ({{ carrito.length }})" 
+        icon="pi pi-shopping-cart" 
+        (click)="mostrarCarrito = true" 
+        severity="info">
+        </p-button>
+    </div>
+  </header>
+  <!-- Número de mesa -->
+  <div class="text-center mb-6">
+    <h2 class="text-2xl font-bold text-blue-900">Mesa {{ numeroMesa }}</h2>
+  </div>
+<p-card>
+  <!-- Tabs -->
+    <p-tabs value="0">
+        <p-tablist>
+        <p-tab value="0">Entradas</p-tab>
+        <p-tab value="1">Platos</p-tab>
+        <p-tab value="2">Postres</p-tab>
+        <p-tab value="3">Bebestibles</p-tab>
+        <p-tab value="4">Raciones</p-tab>
+        <p-tab value="5">Sopas</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+        <!-- Entradas -->
+        <p-tabpanel value="0">
+            <p-dataview #dv [value]="entradas">
+                <ng-template #list let-items>
+                    <div class="grid grid-cols-12 gap-4 grid-nogutter">
+                        <div class="col-span-12" *ngFor="let item of items; let first = first">
+                            <div
+                            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                            [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }">
+                                <div class="md:w-40 relative">
+                                <!-- Imagen -->
+                                    <img [src]="item.image" [alt]="item.name" class="block xl:block mx-auto rounded-border w-full" />
+                                </div>
+                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                        <div>
+                                            <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
+                                            <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                            {{ item.descripcion }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:items-end gap-8">
+                                        <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
+                                            '$' + item.price
+                                        }}</span>
+                                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                                           <p-button 
+                                                icon="pi pi-shopping-cart"
+                                                class="flex-auto md:flex-initial whitespace-nowrap"
+                                                label="Buy Now"
+                                                (click)="abrirCantidad(item)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div> 
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </p-tabpanel>
+
+        <!-- Platos -->
+        <p-tabpanel value="1">
+            <p-dataview #dv [value]="platos">
+                <ng-template #list let-items>
+                    <div class="grid grid-cols-12 gap-4 grid-nogutter">
+                        <div class="col-span-12" *ngFor="let item of items; let first = first">
+                            <div
+                            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                            [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }">
+                                <div class="md:w-40 relative">
+                                <!-- Imagen -->
+                                    <img [src]="item.image" [alt]="item.name" class="block xl:block mx-auto rounded-border w-full" />
+                                </div>
+                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                        <div>
+                                            <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
+                                            <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                            {{ item.descripcion }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:items-end gap-8">
+                                        <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
+                                            '$' + item.price
+                                        }}</span>
+                                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                                           <p-button 
+                                                icon="pi pi-shopping-cart"
+                                                class="flex-auto md:flex-initial whitespace-nowrap"
+                                                label="Buy Now"
+                                                (click)="abrirCantidad(item)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div> 
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </p-tabpanel>
+
+        <!-- Postres -->
+        <p-tabpanel value="2">
+            <p-dataview #dv [value]="postres">
+                <ng-template #list let-items>
+                    <div class="grid grid-cols-12 gap-4 grid-nogutter">
+                        <div class="col-span-12" *ngFor="let item of items; let first = first">
+                            <div
+                            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                            [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }">
+                                <div class="md:w-40 relative">
+                                <!-- Imagen -->
+                                    <img [src]="item.image" [alt]="item.name" class="block xl:block mx-auto rounded-border w-full" />
+                                </div>
+                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                        <div>
+                                            <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
+                                            <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                            {{ item.descripcion }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:items-end gap-8">
+                                        <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
+                                            '$' + item.price
+                                        }}</span>
+                                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                                           <p-button 
+                                                icon="pi pi-shopping-cart"
+                                                class="flex-auto md:flex-initial whitespace-nowrap"
+                                                label="Buy Now"
+                                                (click)="abrirCantidad(item)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div> 
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </p-tabpanel>
+
+        <!-- Bebestibles -->
+        <p-tabpanel value="3">
+            <p-dataview #dv [value]="bebestibles">
+                <ng-template #list let-items>
+                    <div class="grid grid-cols-12 gap-4 grid-nogutter">
+                        <div class="col-span-12" *ngFor="let item of items; let first = first">
+                            <div
+                            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                            [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }">
+                                <div class="md:w-40 relative">
+                                <!-- Imagen -->
+                                    <img [src]="item.image" [alt]="item.name" class="block xl:block mx-auto rounded-border w-full" />
+                                </div>
+                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                        <div>
+                                            <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
+                                            <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                            {{ item.descripcion }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:items-end gap-8">
+                                        <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
+                                            '$' + item.price
+                                        }}</span>
+                                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                                           <p-button 
+                                                icon="pi pi-shopping-cart"
+                                                class="flex-auto md:flex-initial whitespace-nowrap"
+                                                label="Buy Now"
+                                                (click)="abrirCantidad(item)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div> 
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </p-tabpanel>
+
+        <!-- Raciones -->
+        <p-tabpanel value="4">
+            <p-dataview #dv [value]="raciones">
+                <ng-template #list let-items>
+                    <div class="grid grid-cols-12 gap-4 grid-nogutter">
+                        <div class="col-span-12" *ngFor="let item of items; let first = first">
+                            <div
+                            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                            [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }">
+                                <div class="md:w-40 relative">
+                                <!-- Imagen -->
+                                    <img [src]="item.image" [alt]="item.name" class="block xl:block mx-auto rounded-border w-full" />
+                                </div>
+                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                        <div>
+                                            <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
+                                            <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                            {{ item.descripcion }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:items-end gap-8">
+                                        <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
+                                            '$' + item.price
+                                        }}</span>
+                                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                                           <p-button 
+                                                icon="pi pi-shopping-cart"
+                                                class="flex-auto md:flex-initial whitespace-nowrap"
+                                                label="Buy Now"
+                                                (click)="abrirCantidad(item)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div> 
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </p-tabpanel>
+
+        <!-- Sopas -->
+        <p-tabpanel value="5">
+            <p-dataview #dv [value]="sopas">
+                <ng-template #list let-items>
+                    <div class="grid grid-cols-12 gap-4 grid-nogutter">
+                        <div class="col-span-12" *ngFor="let item of items; let first = first">
+                            <div
+                            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                            [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }">
+                                <div class="md:w-40 relative">
+                                <!-- Imagen -->
+                                    <img [src]="item.image" [alt]="item.name" class="block xl:block mx-auto rounded-border w-full" />
+                                </div>
+                                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                                    <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                                        <div>
+                                            <span class="font-medium text-secondary text-sm">{{ item.category }}</span>
+                                            <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                            {{ item.descripcion }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:items-end gap-8">
+                                        <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">{{
+                                            '$' + item.price
+                                        }}</span>
+                                        <div class="flex flex-row-reverse md:flex-row gap-2">
+                                           <p-button 
+                                                icon="pi pi-shopping-cart"
+                                                class="flex-auto md:flex-initial whitespace-nowrap"
+                                                label="Buy Now"
+                                                (click)="abrirCantidad(item)"></p-button>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div> 
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataview>
+        </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</p-card>
+</div>
+<!-- Diálogo para cantidad -->
+<p-dialog header="Seleccionar cantidad" [(visible)]="showCantidadDialog" [modal]="true" [style]="{width: '30vw'}">
+  <div class="flex flex-col gap-4">
+    <p>¿Cuántas unidades de <strong>{{ productoSeleccionado?.name }}</strong> deseas pedir?</p>
+    <input type="number" [(ngModel)]="cantidadSeleccionada" min="1" class="border rounded-md p-2 w-full" />
+  </div>
+  <div class="flex justify-end gap-2 mt-4">
+    <p-button label="Confirmar" icon="pi pi-check" (click)="confirmarPedido()" severity="success"></p-button>
+    <p-button label="Cancelar" icon="pi pi-times" (click)="showCantidadDialog=false" severity="secondary"></p-button>
+  </div>
+</p-dialog>
+
+<p-dialog header="Carrito de pedidos" [(visible)]="mostrarCarrito" [modal]="true" [style]="{width: '50vw'}">
+  <div *ngIf="carrito.length > 0; else vacio">
+    <table class="w-full border-collapse border border-gray-300">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border border-gray-300 p-2 text-left">Producto</th>
+          <th class="border border-gray-300 p-2 text-center">Cantidad</th>
+          <th class="border border-gray-300 p-2 text-right">Precio</th>
+          <th class="border border-gray-300 p-2 text-right">Subtotal</th>
+          <th class="border border-gray-300 p-2 text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr  *ngFor="let item of carrito; let i = index">
+          <td class="border border-gray-300 p-2">{{ item.name }}</td>
+          <td class="border border-gray-300 p-2 text-center">{{ item.cantidad }}</td>
+          <td class="border border-gray-300 p-2 text-right">${{ item.price }}</td>
+          <td class="border border-gray-300 p-2 text-right">${{ item.price * item.cantidad }}</td>
+          <td class="border border-gray-300 p-2 text-center">
+            <p-button 
+            icon="pi pi-trash" 
+            severity="danger" 
+            (click)="eliminarDelCarrito(i)">
+            </p-button>
+        </td>
+        </tr>
+      </tbody>
+      <tfoot class="bg-gray-50">
+        <tr>
+            <td colspan="3" class="border border-gray-300 p-2 text-right font-semibold">Total Neto</td>
+            <td class="border border-gray-300 p-2 text-right">
+            ${{ totalNeto }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" class="border border-gray-300 p-2 text-right font-semibold">IVA (19%)</td>
+            <td class="border border-gray-300 p-2 text-right">
+            ${{ iva }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" class="border border-gray-300 p-2 text-right font-bold">Total con IVA</td>
+            <td class="border border-gray-300 p-2 text-right font-bold">
+            ${{ totalConIva }}
+            </td>
+        </tr>
+    </tfoot>
+    </table>
+
+    <div class="flex justify-end mt-4">
+      <p-button label="Enviar pedido" icon="pi pi-check" (click)="enviarPedido()" severity="success"></p-button>
+    </div>
+  </div>
+
+  <ng-template #vacio>
+    <p>No hay productos en el carrito.</p>
+  </ng-template>
+</p-dialog>
+
+
+
+
+
