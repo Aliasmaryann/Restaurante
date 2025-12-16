@@ -3,7 +3,13 @@
 <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
     <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
       <h1 class="text-2xl font-semibold text-blue-900">Gestión de Cocina</h1>
-     
+     <button 
+        pButton 
+        label="Cerrar sesión" 
+        icon="pi pi-sign-out" 
+        class="p-button-sm p-button-danger"
+        (click)="cerrarSesion()">
+      </button>
     </div>
   </header>
 <p-card class="mx-auto max-w-7xl mt-2 px-4 py-6">

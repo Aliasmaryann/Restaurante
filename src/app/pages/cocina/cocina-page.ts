@@ -10,6 +10,8 @@ import { SelectModule } from 'primeng/select';
 import { DrawerModule } from 'primeng/drawer';
 import { CardModule } from 'primeng/card';
 import { FormsModule } from '@angular/forms';
+import { Auth } from '../../services/auth';
+
 
 @Component({
   selector: 'app-cocina-page',
@@ -31,7 +33,7 @@ export class CocinaPage implements OnInit {
 
 
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: Auth) {}
 
   ngOnInit() {
     this.loadMetrics();
@@ -57,6 +59,9 @@ export class CocinaPage implements OnInit {
       this.pedidosActivos = data;
       this.cdr.detectChanges();
     });
+  }
+  cerrarSesion() {
+    this.auth.logout();
   }
 
   cambiarEstado(id: number, estado: string) {

@@ -17,6 +17,7 @@ import { RippleModule } from 'primeng/ripple';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
+import { Auth } from '../../../services/auth';
 
 
 @Component({
@@ -92,7 +93,7 @@ export class Dashboard {
 
 private api = 'http://localhost:3000';
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: Auth ) {
     
     this.cargarTotales();
     this.cargarMovimientos();
@@ -211,6 +212,9 @@ eliminarMovimientos() {
     },
     error: err => console.error('Error al eliminar movimientos:', err)
   });
+}
+cerrarSesion() {
+  this.auth.logout();
 }
 
 

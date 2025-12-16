@@ -21,7 +21,7 @@ import { DatePickerModule } from "primeng/datepicker";
 import { CardModule } from 'primeng/card';
 import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
-
+import { Auth } from '../../../services/auth';
 
 
 @Component({
@@ -106,7 +106,7 @@ export class BodegaPage implements OnInit {
     return this.recetas.find(r => r.id === this.recetaSeleccionadaId);
   }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: Auth) {}
 
 
   
@@ -116,7 +116,9 @@ export class BodegaPage implements OnInit {
     this.loadTotales();
     this.loadMesas();
   }
-  
+  cerrarSesion() {
+    this.auth.logout();
+  }
   loadTotales() {
     this.http.get<any>('http://localhost:3000/bodega/totales').subscribe(data => {
       this.totales = data;

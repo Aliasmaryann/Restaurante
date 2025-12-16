@@ -11,7 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-config',
@@ -55,6 +55,8 @@ export class Config implements OnInit {
     bloqueados: 0,
     ultimoAcceso: ''
   };
+  constructor( public auth: Auth) {}
+
 
   ngOnInit() {
     this.cargarUsuarios();
@@ -89,6 +91,10 @@ export class Config implements OnInit {
       }
 
     ];
+  }
+
+  cerrarSesion() {
+    this.auth.logout();
   }
 
   calcularStats() {

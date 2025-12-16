@@ -10,6 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { Card } from "primeng/card";
 import { TagModule } from 'primeng/tag';
+import { Auth } from '../../services/auth';
 
 
 @Component({
@@ -35,7 +36,7 @@ export class ClientesPage {
   productoSeleccionado: any = null;
   cantidadSeleccionada = 1;
 
- constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+ constructor(private http: HttpClient, private cdr: ChangeDetectorRef, public auth: Auth) {}
 
   entradas: any[] = [];
   platos: any[] = [];
@@ -69,6 +70,9 @@ export class ClientesPage {
         error: (err) => console.error('Error cargando recetas:', err)
       });
     }
+    cerrarSesion() {
+    this.auth.logout();
+  }
 
 
     abrirCantidad(item: any) {

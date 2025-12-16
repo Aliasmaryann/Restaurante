@@ -6,6 +6,14 @@
         <nav class="flex gap-4">
           <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/bodega-page">Bodega</a>
           <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/config">Configuración</a>
+          <button 
+            pButton 
+            label="Cerrar sesión" 
+            icon="pi pi-sign-out" 
+            class="p-button-sm p-button-danger"
+            (click)="cerrarSesion()">
+          </button>
+
         </nav>
       </div>
   </header>
