@@ -28,9 +28,22 @@ export const routes: Routes = [
       import('./pages/admin/admin.routes').then(m => m.ADMIN_ROUTES)
   },
   {
+    path: 'cocina',
+    loadComponent: () =>
+      import('./pages/cocina/cocina-page')
+        .then(c => c.CocinaPage)
+  },
+
+  {
   path: 'clientes',
-  loadChildren: () =>
-    import('./pages/clientes/clientes-page-module').then(m => m.ClientesPageModule),
-}
+    loadChildren: () =>
+      import('./pages/clientes/clientes-page-module').then(m => m.ClientesPageModule),
+  },
+
+  {
+    path: 'config',
+    loadChildren: () =>
+      import('./pages/config/config-module').then(m => m.ConfigModule),
+  }
 
 ];

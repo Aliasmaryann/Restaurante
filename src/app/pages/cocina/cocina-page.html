@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-gray-50">
+
+<header class="sticky top-0 z-30 bg-white border-b border-gray-200">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-blue-900">Gestión de Cocina</h1>
+     
+    </div>
+  </header>
+<p-card class="mx-auto max-w-7xl mt-2 px-4 py-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="rounded-lg border p-4 bg-white">
+    <p class="text-xs uppercase text-gray-500">Pendientes</p>
+    <p class="mt-2 text-2xl font-bold text-red-600">{{ metrics.pendientes }}</p>
+  </div>
+  <div class="rounded-lg border p-4 bg-white">
+    <p class="text-xs uppercase text-gray-500">En preparación</p>
+    <p class="mt-2 text-2xl font-bold text-yellow-600">{{ metrics.preparacion }}</p>
+  </div>
+  <div class="rounded-lg border p-4 bg-white">
+    <p class="text-xs uppercase text-gray-500">Listos</p>
+    <p class="mt-2 text-2xl font-bold text-green-600">{{ metrics.listos }}</p>
+  </div>
+  <div class="rounded-lg border p-4 bg-white">
+    <p class="text-xs uppercase text-gray-500">Recetas más pedidas hoy</p>
+    <ul class="mt-2">
+      <li *ngFor="let receta of metrics.topRecetas">{{ receta.nombre }} ({{ receta.total }})</li>
+    </ul>
+  </div>
+</div>
+</p-card>
+
+<!-- Tabla de pedidos -->
+ <p-card class="mx-auto max-w-7xl mt-2 px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+  <h2 class="text-xl font-semibold text-blue-900">Pedidos activos</h2>
+  <p-button 
+    label="Ver Recetas" 
+    icon="pi pi-book" 
+    (click)="mostrarDrawer = true; loadRecetas()" 
+    severity="info"
+    class="ml-7">
+  </p-button>
+</div>
+<p-table [value]="pedidosActivos" [paginator]="true" [rows]="10" [resizableColumns]="true" [showGridlines]="true">
+          
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Mesa</th>
+      <th>Hora</th>
+      <th>Estado</th>
+      <th>Recetas</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-pedido>
+    <tr>
+      <td>{{ pedido.mesa }}</td>
+      <td>{{ pedido.fecha | date:'shortTime' }}</td>
+      <td>{{ pedido.estado }}</td>
+      <td>
+        <ul>
+          <li *ngFor="let item of pedido.recetas">{{ item.nombre }} x{{ item.cantidad }}</li>
+        </ul>
+      </td>
+      <td>
+        <p-button label="Preparar" (click)="cambiarEstado(pedido.id, 'En preparación')" *ngIf="pedido.estado==='Pendiente'"></p-button>
+        <p-button label="Listo" (click)="cambiarEstado(pedido.id, 'Listo')" *ngIf="pedido.estado==='En preparación'"></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+</p-card>
+
+<p-card class="mx-auto max-w-7xl mt-2 px-4 py-6">
+  <h2 class="text-xl font-semibold text-green-700 mb-4">Pedidos Listos</h2>
+  <p-table [value]="pedidosListos" [paginator]="true" [rows]="10" [resizableColumns]="true" [showGridlines]="true">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Mesa</th>
+        <th>Hora</th>
+        <th>Recetas</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-pedido>
+      <tr>
+        <td>{{ pedido.mesa }}</td>
+        <td>{{ pedido.fecha | date:'shortTime' }}</td>
+        <td>
+          <ul>
+            <li *ngFor="let item of pedido.recetas">{{ item.nombre }} x{{ item.cantidad }}</li>
+          </ul>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+
+<p-drawer [(visible)]="mostrarDrawer" position="right" header="Recetas" [modal]="true" [style]="{width: '40vw'}">
+  <div class="p-4">
+    <p-select 
+      [options]="recetas" 
+      optionLabel="nombre" 
+      optionValue="id"
+      placeholder="Selecciona una receta"
+      [(ngModel)]="recetaSeleccionadaId"
+      (onChange)="cargarDetalleReceta(recetaSeleccionadaId)"
+      class="w-full mb-4">
+    </p-select>
+
+    <div *ngIf="detalleSeleccionado">
+      <h3 class="text-lg font-semibold text-blue-900">{{ recetaSeleccionada?.nombre }}</h3>
+      <p class="text-sm text-gray-600 italic">{{ recetaSeleccionada?.categoria }} — ${{ recetaSeleccionada?.precio }}</p>
+      <p class="mt-2"><strong>Descripción:</strong> {{ recetaSeleccionada?.descripcion }}</p>
+      <p class="mt-2"><strong>Ingredientes:</strong> {{ detalleSeleccionado.ingredientes }}</p>
+      <p class="mt-1"><strong>Preparación:</strong> {{ detalleSeleccionado.descripcion }}</p>
+    </div>
+  </div>
+</p-drawer>
+</div>

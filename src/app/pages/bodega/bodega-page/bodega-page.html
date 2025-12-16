@@ -2,12 +2,11 @@
   <!-- Top header -->
   <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
     <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-      <h1 class="text-2xl font-semibold text-blue-900">Gestión de Bodega</h1>
+      <h1 class="text-2xl font-semibold text-blue-900">Gestiónes</h1>
       <nav class="flex gap-4">
-        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/admin/dashboard">Dashboard</a>
-        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/productos">Productos</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/admin/dashboard">Finanzas</a>
         <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/cocina">Cocina</a>
-        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/configuracion">Configuración</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/config">Configuración</a>
       </nav>
     </div>
   </header>
@@ -31,11 +30,11 @@
     </section>
 
     <!-- Toolbar -->
-    <section class="rounded-lg border border-gray-200 bg-white">
-      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between p-4">
+    <p-card class="p-4">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center -mt-5 md:justify-between p-4">
         <div class="flex items-center gap-2">
           <i class="pi pi-box text-gray-700"></i>
-          <span class="text-xl font-medium text-blue-900">Entradas de stock</span>
+          <span class="text-xl font-medium text-blue-900">Bodega</span>
         </div>
         <div class="flex flex-1 md:flex-none items-center gap-3">
           <span class="p-input-icon-left w-full md:w-72">
@@ -69,117 +68,17 @@
             severity="secondary"
             (click)="abrirDialogoEditar()" 
             [disabled]="selectedRows.length !== 1"></button>
+          <button 
+            pButton
+            label="Ver Recetas" 
+            icon="pi pi-book" 
+            (click)="loadRecetas(); mostrarDrawer = true" 
+            severity="info">
+          </button>
         </div>
       </div>
 
-      <!-- Diálogo -->
-      <p-dialog header="Nueva entrada de bodega" [(visible)]="showDialogNuevo" [modal]="true" [style]="{width: '42vw'}">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Fecha</label>
-            <input type="date" [(ngModel)]="nuevaEntrada.fecha" class="mt-1 block w-full border rounded-md p-2" />
-          </div>
-
-          <div>
-            <p-floatLabel>
-              <select id="producto" [(ngModel)]="nuevaEntrada.producto_id" class="w-full border rounded-md p-2">
-                <option [ngValue]="0">Selecciona producto</option>
-                <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.nombre }}</option>
-              </select>
-              
-            </p-floatLabel>
-            </div>
-            <div>
-            <!-- Proveedor -->
-            <p-floatLabel>
-              <select id="proveedor" [(ngModel)]="nuevaEntrada.proveedor_id" class="w-full border rounded-md p-2">
-                <option [ngValue]="0">Selecciona proveedor</option>
-                <option *ngFor="let pr of proveedores" [ngValue]="pr.id">{{ pr.nombre }}</option>
-              </select>
-              
-            </p-floatLabel>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Categoría</label>
-            <input type="text" [(ngModel)]="nuevaEntrada.categoria" class="mt-1 block w-full border rounded-md p-2" />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Cantidad</label>
-            <input type="number" [(ngModel)]="nuevaEntrada.cantidad" class="mt-1 block w-full border rounded-md p-2" />
-          </div>
-
-          
-        </div>
-
-        <div class="flex justify-end gap-2 px-4 pb-4">
-          <button pButton label="Guardar" icon="pi pi-check" (click)="guardarEntrada()" severity="success"></button>
-          <button pButton label="Cancelar" icon="pi pi-times" (click)="showDialog=false" severity="secondary"></button>
-        </div>
-      </p-dialog>
-
-      <p-dialog 
-      [header]="editando ? 'Editar entrada de bodega' : 'Nueva entrada de bodega'" 
-      [(visible)]="showDialogEditar" 
-      [modal]="true" 
-      [style]="{width: '42vw'}">
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-        <!-- Fecha -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Fecha</label>
-          <input type="date" [(ngModel)]="nuevaEntrada.fecha" class="mt-1 block w-full border rounded-md p-2" />
-        </div>
-
-        <!-- Producto -->
-        <div>
-          <p-floatLabel>
-            <select id="producto" [(ngModel)]="nuevaEntrada.producto_id" class="w-full border rounded-md p-2">
-              <option [ngValue]="0">Selecciona producto</option>
-              <option *ngFor="let p of productos" [ngValue]="p.id">{{ p.nombre }}</option>
-            </select>
-          </p-floatLabel>
-        </div>
-
-        <!-- Proveedor -->
-        <div>
-          <p-floatLabel>
-            <select id="proveedor" [(ngModel)]="nuevaEntrada.proveedor_id" class="w-full border rounded-md p-2">
-              <option [ngValue]="0">Selecciona proveedor</option>
-              <option *ngFor="let pr of proveedores" [ngValue]="pr.id">{{ pr.nombre }}</option>
-            </select>
-          </p-floatLabel>
-        </div>
-
-        <!-- Categoría -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Categoría</label>
-          <input type="text" [(ngModel)]="nuevaEntrada.categoria" class="mt-1 block w-full border rounded-md p-2" />
-        </div>
-
-        <!-- Cantidad -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Cantidad</label>
-          <input type="number" [(ngModel)]="nuevaEntrada.cantidad" class="mt-1 block w-full border rounded-md p-2" />
-        </div>
-      </div>
-
-      <!-- Botones -->
-      <div class="flex justify-end gap-2 px-4 pb-4">
-        <button pButton 
-          [label]="editando ? 'Actualizar' : 'Guardar'" 
-          icon="pi pi-check" 
-          (click)="editando ? editarEntrada() : guardarEntrada()" 
-          severity="success">
-        </button>
-        <button pButton label="Cancelar" icon="pi pi-times" (click)="showDialog=false; editando=false" severity="secondary"></button>
-      </div>
-    </p-dialog>
-
-
-        <!-- Table -->
-      <div class="p-4">
+      
         <p-table
           [value]="rows"
           [paginator]="true"
@@ -200,7 +99,6 @@
               <th pResizableColumn pSortableColumn="categoria" aria-label="Categoría">Categoría</th>
               <th pResizableColumn pSortableColumn="cantidad" aria-label="Cantidad" class="text-right">Cantidad</th>
               <th pResizableColumn pSortableColumn="proveedor" aria-label="Proveedor">Proveedor</th>
-              <th aria-label="Acciones" class="w-40">Acciones</th>
             </tr>
           </ng-template>
 
@@ -214,9 +112,7 @@
               <td>{{ row.categoria }}</td>
               <td class="text-right">{{ row.cantidad }}</td>
               <td>{{ row.proveedor }}</td>
-              <td class="flex gap-2">
-                
-              </td>
+              
             </tr>
           </ng-template>
 
@@ -228,12 +124,362 @@
             </tr>
           </ng-template>
         </p-table>
-      </div>
-    </section>
-   
-    <!-- Add / Edit dialog -->
-    
-     
-        <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div> -->
+      </p-card>
 
+      <!-- Drawer lateral -->
+      <p-drawer [(visible)]="mostrarDrawer" position="right" header="Recetas" [modal]="true" [style]="{width: '40vw'}">
+        <div class="p-4">
+          <!-- Selector de receta -->
+          <p-select 
+            [options]="recetas" 
+            optionLabel="nombre" 
+            optionValue="id"  
+            placeholder="Selecciona una receta"
+            [(ngModel)]="recetaSeleccionadaId"
+            (onChange)="cargarDetalleReceta(recetaSeleccionadaId)"
+            class="w-full mb-4">
+          </p-select>
+
+          <!-- Mostrar detalle -->
+          <div *ngIf="detalleSeleccionado">
+            <h3 class="text-lg font-semibold text-blue-900">
+              {{ recetaSeleccionada?.nombre }}
+            </h3>
+            <p class="text-sm text-gray-600 italic">
+              {{ recetaSeleccionada?.categoria }} — ${{ recetaSeleccionada?.precio }}
+            </p>
+            <p class="mt-2"><strong>Descripción:</strong> {{ recetaSeleccionada?.descripcion }}</p>
+            <p class="mt-2"><strong>Ingredientes:</strong> {{ detalleSeleccionado.ingredientes }}</p>
+            <p class="mt-1"><strong>Preparación:</strong> {{ detalleSeleccionado.descripcion }}</p>
+          </div>
+
+          <div *ngIf="!detalleSeleccionado && recetaSeleccionadaId">
+            <p class="text-gray-500 italic">Esta receta no tiene detalle registrado.</p>
+          </div>
+        </div>
+      </p-drawer>
+
+      <!-- Diálogo -->
+      <p-dialog header="Nueva entrada de bodega" [(visible)]="showDialogNuevo" [modal]="true" [style]="{width: '42vw'}">
+        
+        <div class="grid grid-cols-12 gap-4 p-4">
+
+         <div class="col-span-6 w-full">
+          <p-floatLabel>
+            <p-datepicker 
+              inputId="fecha" 
+              [(ngModel)]="nuevaEntrada.fecha" 
+              dateFormat="dd/mm/yy" 
+              placeholder="Fecha"
+              showIcon iconDisplay="input"
+              fluid/>
+          </p-floatLabel>
+        </div>
+
+        <div class="col-span-6">
+            <p-select 
+            [(ngModel)]="nuevaEntrada.producto_id" 
+            inputId="producto" 
+              [options]="productos" 
+              optionLabel="nombre" 
+              optionValue="id" 
+              placeholder="Producto"
+              class="w-full">
+            </p-select>
+        </div>
+
+            <!-- Proveedor -->
+        <div class="col-span-6">      
+          <p-select 
+            inputId="proveedor" 
+            [(ngModel)]="nuevaEntrada.proveedor_id"
+            [options]="proveedores"
+            placeholder="Proveedor"
+            optionLabel="nombre"
+            optionValue="id" 
+            class="w-full">
+          </p-select>                     
+        </div>
+
+        <div class="col-span-6" >
+          <input pInputText id="categoria" placeholder="Categoría" type="text" [(ngModel)]="nuevaEntrada.categoria" class="w-full" />
+        </div>
+
+        <div class="col-span-6">          
+            <input pInputText id="cantidad" type="number" placeholder="Cantidad" [(ngModel)]="nuevaEntrada.cantidad" class="w-full" />                      
+        </div>          
+       </div>
+
+        <div class="flex justify-end gap-2 px-4 pb-4">
+          <button pButton label="Guardar" icon="pi pi-check" (click)="guardarEntrada()" severity="success"></button>
+          <button pButton label="Cancelar" icon="pi pi-times" (click)="showDialog=false" severity="secondary"></button>
+        </div>
+      </p-dialog>
+
+      <p-dialog 
+      [header]="editando ? 'Editar entrada de bodega' : 'Nueva entrada de bodega'" 
+      [(visible)]="showDialogEditar" 
+      [modal]="true" 
+      [style]="{width: '42vw'}">
+
+      <div class="grid grid-cols-12 gap-4 p-4">
+        <!-- Fecha -->
+        <div class="col-span-6 w-full">
+          <p-floatLabel>
+            <p-datepicker 
+              inputId="fecha" 
+              [(ngModel)]="nuevaEntrada.fecha" 
+              dateFormat="dd/mm/yy" 
+              placeholder="Fecha"
+              showIcon iconDisplay="input"
+              fluid/>
+          </p-floatLabel>
+        </div>
+
+        <!-- Producto -->
+        <div class="col-span-6">
+            <p-select 
+            [(ngModel)]="nuevaEntrada.producto_id" 
+            inputId="producto" 
+              [options]="productos" 
+              optionLabel="nombre" 
+              optionValue="id" 
+              placeholder="Producto"
+              class="w-full">
+            </p-select>
+        </div>
+
+        <!-- Proveedor -->
+        <div class="col-span-6">      
+          <p-select 
+            inputId="proveedor" 
+            [(ngModel)]="nuevaEntrada.proveedor_id"
+            [options]="proveedores"
+            placeholder="Proveedor"
+            optionLabel="nombre"
+            optionValue="id" 
+            class="w-full">
+          </p-select>                     
+        </div>
+
+        <!-- Categoría -->
+        <div class="col-span-6" >
+          <input pInputText id="categoria" placeholder="Categoría" type="text" [(ngModel)]="nuevaEntrada.categoria" class="w-full" />
+        </div>
+
+        <!-- Cantidad -->
+        <div class="col-span-6">          
+            <input pInputText id="cantidad" type="number" placeholder="Cantidad" [(ngModel)]="nuevaEntrada.cantidad" class="w-full" />                      
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-2 px-4 pb-4">
+        <button pButton 
+          [label]="editando ? 'Actualizar' : 'Guardar'" 
+          icon="pi pi-check" 
+          (click)="editando ? editarEntrada() : guardarEntrada()" 
+          severity="success">
+        </button>
+        <button pButton label="Cancelar" icon="pi pi-times" (click)="showDialog=false; editando=false" severity="secondary"></button>
+      </div>
+    </p-dialog>
+
+  
+    <p-card header="Gestión rápida" class="mt-6">
+    <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Productos</p-tab>
+      <p-tab value="1">Mesas</p-tab>
+      <p-tab value="2">Proveedores</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <div class="flex flex-1 md:flex-none mb-4 mt-4 items-center gap-3">
+          <span class="p-input-icon-left w-full md:w-72">
+            <p-iconfield>
+              <input
+                pInputText
+                type="text"
+                class="w-full"
+                placeholder="Buscar Producto"/>
+              <p-inputicon class="pi pi-search" />
+            </p-iconfield>
+          </span>
+          <button
+            pButton
+            type="button"
+            label="Agregar"
+            icon="pi pi-plus"
+            class=""
+            (click)="abrirDialogo()"
+            severity="success"      
+          ></button>
+          <button pButton 
+            label="Eliminar" 
+            icon="pi pi-trash" 
+            severity="danger" 
+            (click)="eliminarSeleccionados()"></button>
+          <button pButton 
+            label="Editar" 
+            icon="pi pi-pencil" 
+            severity="secondary"
+            (click)="abrirDialogoEditar()"></button>
+          
+        </div>
+      
+        <p-table [value]="productos" [rows]="5" dataKey="id" [paginator]="true" [resizableColumns]="true" [showGridlines]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Stock</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-prod>
+            <tr>
+              <td>
+                <p-tableCheckbox ></p-tableCheckbox>
+              </td>
+              <td>{{ prod.nombre }}</td>
+              <td>{{ prod.categoria }}</td>
+              <td>{{ prod.precio | currency:'CLP' }}</td>
+              <td>{{ prod.stock }}</td>
+
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        <div class="flex flex-1 md:flex-none mb-4 mt-4 items-center gap-3">
+          <span class="p-input-icon-left w-full md:w-72">
+            <p-iconfield>
+              <input
+                pInputText
+                type="text"
+                class="w-full"
+                placeholder="Buscar Mesa"/>
+              <p-inputicon class="pi pi-search" />
+            </p-iconfield>
+          </span>
+          <button
+            pButton
+            type="button"
+            label="Agregar"
+            icon="pi pi-plus"
+            class=""
+            (click)="abrirDialogo()"
+            severity="success"      
+          ></button>
+          <button pButton 
+            label="Eliminar" 
+            icon="pi pi-trash" 
+            severity="danger" 
+            (click)="eliminarSeleccionados()"></button>
+          <button pButton 
+            label="Editar" 
+            icon="pi pi-pencil" 
+            severity="secondary"
+            (click)="abrirDialogoEditar()"></button>
+          
+        </div>
+        <p-table [value]="mesas" [rows]="5" [paginator]="true" [resizableColumns]="true" [showGridlines]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th>Número</th>
+              <th>Estado</th>
+              
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-mesa>
+            <tr>
+              <td>
+                <p-tableCheckbox ></p-tableCheckbox>
+              </td>
+              <td>{{ mesa.numero }}</td>
+              <td>
+                <p-tag 
+                  [value]="mesa.estado" 
+                  [severity]="mesa.severity">
+                </p-tag>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+
+      <p-tabpanel value="2">
+        <div class="flex flex-1 md:flex-none mb-4 mt-4 items-center gap-3">
+          <span class="p-input-icon-left w-full md:w-72">
+            <p-iconfield>
+              <input
+                pInputText
+                type="text"
+                class="w-full"
+                placeholder="Buscar Proveedor"/>
+              <p-inputicon class="pi pi-search" />
+            </p-iconfield>
+          </span>
+          <button
+            pButton
+            type="button"
+            label="Agregar"
+            icon="pi pi-plus"
+            class=""
+            (click)="abrirDialogo()"
+            severity="success"      
+          ></button>
+          <button pButton 
+            label="Eliminar" 
+            icon="pi pi-trash" 
+            severity="danger" 
+            (click)="eliminarSeleccionados()"></button> 
+            
+          <button pButton 
+            label="Editar" 
+            icon="pi pi-pencil" 
+            severity="secondary"
+            (click)="abrirDialogoEditar()"></button>
+          
+        </div>
+        <p-table [value]="proveedores" [rows]="10" [paginator]="true" [resizableColumns]="true" [showGridlines]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
+              <th>Nombre</th>
+              <th>Contacto</th>
+              <th>Telefono</th>
+              <th>Email</th>
+              <th>Dirección</th>
+              <th>Categoría</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-prov>
+            <tr>
+              <td>
+                <p-tableCheckbox ></p-tableCheckbox>
+              </td>
+              <td>{{ prov.nombre }}</td>
+              <td>{{ prov.contacto }}</td>
+              <td>{{ prov.telefono }}</td>
+              <td>{{ prov.email }}</td>
+              <td>{{ prov.direccion }}</td>
+              <td>{{ prov.categoria }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</p-card>

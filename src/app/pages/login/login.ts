@@ -51,7 +51,7 @@ export class LoginPages {
         if (role === 'admin') {
           this.router.navigate(['/bodega-page']);
         } else if (role === 'trabajador') {
-          this.router.navigate(['/admin']);
+          this.router.navigate(['/cocina']);
         } else if (role === 'cliente') {
           this.router.navigate(['/clientes']);
         }

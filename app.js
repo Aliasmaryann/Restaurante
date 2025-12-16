@@ -36,15 +36,43 @@ app.post('/login', async (req, res) => {
   }
 });
 // Productos
+// Obtener todos los productos
 app.get('/productos', async (req, res) => {
-  const r = await pool.query(`SELECT id, nombre FROM productos ORDER BY nombre`);
-  res.json(r.rows);
+  try {
+    const result = await pool.query('SELECT * FROM productos ORDER BY nombre ASC');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener productos' });
+  }
+});
+// Obtener todos los proveedores
+app.get('/proveedores', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM proveedores ORDER BY nombre ASC');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener proveedores' });
+  }
 });
 
-app.get('/proveedores', async (req, res) => {
-  const r = await pool.query(`SELECT id, nombre FROM proveedores ORDER BY nombre`);
-  res.json(r.rows);
+// Agregar proveedor
+app.post('/proveedores', async (req, res) => {
+  const { nombre, contacto, telefono, email, direccion, categoria } = req.body;
+  try {
+    const result = await pool.query(
+      `INSERT INTO proveedores (nombre, contacto, telefono, email, direccion, categoria)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [nombre, contacto, telefono, email, direccion, categoria]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al agregar proveedor' });
+  }
 });
+
 
 
 app.get('/bodega', async (req, res) => {
@@ -279,6 +307,173 @@ app.post('/finanzas', async (req, res) => {
     res.status(500).json({ error: 'Error al registrar movimiento' });
   }
 });
+
+// Recetas con detalle
+app.get('/recetas/:id/detalle', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const r = await pool.query(
+      `SELECT rd.id, rd.receta_id, rd.descripcion, rd.ingredientes
+       FROM receta_detalle rd
+       WHERE rd.receta_id = $1
+       ORDER BY rd.id`,
+      [id]
+    );
+    res.json(r.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener detalle de receta' });
+  }
+});
+
+// Métricas de cocina
+app.get('/cocina/metrics', async (req, res) => {
+  try {
+    const stats = await pool.query(`
+      SELECT estado, COUNT(*)::int AS total
+      FROM cocina
+      GROUP BY estado
+    `);
+
+    const m = { pendientes: 0, preparacion: 0, listos: 0 };
+    for (const r of stats.rows) {
+      if (r.estado === 'Pendiente') m.pendientes = r.total;
+      if (r.estado === 'En preparación') m.preparacion = r.total;
+      if (r.estado === 'Listo') m.listos = r.total;
+    }
+
+    const topRecetas = await pool.query(`
+      SELECT r.nombre, SUM(dp.cantidad)::int AS total
+      FROM detalle_pedido dp
+      JOIN recetas r ON dp.receta_id = r.id
+      JOIN pedidos p ON dp.pedido_id = p.id
+      WHERE DATE(p.fecha) = CURRENT_DATE
+      GROUP BY r.nombre
+      ORDER BY total DESC
+      LIMIT 3
+    `);
+
+    res.json({ ...m, topRecetas: topRecetas.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener métricas de cocina' });
+  }
+});
+
+
+
+// Crear pedido
+app.post('/pedidos', async (req, res) => {
+  const { mesa, items } = req.body; 
+  try {
+    // Crear pedido
+    const pedido = await pool.query(
+      `INSERT INTO pedidos (mesa, estado) VALUES ($1, 'Pendiente') RETURNING id`,
+      [mesa]
+    );
+    const pedidoId = pedido.rows[0].id;
+
+    // Insertar detalle y cocina
+    for (const item of items) {
+      const receta = await pool.query(`SELECT id, precio FROM recetas WHERE id=$1`, [item.receta_id]);
+
+      await pool.query(
+        `INSERT INTO detalle_pedido (pedido_id, receta_id, cantidad, precio)
+         VALUES ($1, $2, $3, $4)`,
+        [pedidoId, item.receta_id, item.cantidad, receta.rows[0].precio]
+      );
+
+      await pool.query(
+        `INSERT INTO cocina (pedido_id, receta_id, cantidad, estado)
+         VALUES ($1, $2, $3, 'Pendiente')`,
+        [pedidoId, item.receta_id, item.cantidad]
+      );
+    }
+
+    res.json({ success: true, pedidoId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al crear pedido' });
+  }
+});
+
+
+// Pedidos activos con detalle
+// Pedidos activos con detalle y estado desde cocina
+// Activos: pedidos con algún ítem no 'Listo'
+app.get('/cocina/pedidos', async (req, res) => {
+  try {
+    const q = await pool.query(`
+      SELECT 
+        p.id, p.mesa, p.fecha,
+        /* estado general: si hay alguno en preparación, mostramos 'En preparación'; si todos pendientes, 'Pendiente' */
+        CASE 
+          WHEN COUNT(*) FILTER (WHERE c.estado = 'En preparación') > 0 THEN 'En preparación'
+          ELSE 'Pendiente'
+        END AS estado,
+        json_agg(json_build_object('nombre', r.nombre, 'cantidad', c.cantidad, 'estado', c.estado)) AS recetas
+      FROM pedidos p
+      JOIN cocina c ON p.id = c.pedido_id
+      JOIN recetas r ON c.receta_id = r.id
+      WHERE p.estado != 'Entregado'
+      GROUP BY p.id, p.mesa, p.fecha
+      HAVING COUNT(*) FILTER (WHERE c.estado != 'Listo') > 0
+      ORDER BY p.fecha DESC
+    `);
+    res.json(q.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener pedidos activos' });
+  }
+});
+
+
+
+/// Cambiar estado de pedido en cocina
+app.put('/cocina/pedidos/:id', async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+  try {
+    // Actualizar pedido
+    const pedido = await pool.query(
+      `UPDATE pedidos SET estado=$1 WHERE id=$2 RETURNING *`,
+      [estado, id]
+    );
+
+    // Actualizar cocina (si existe registro)
+    await pool.query(
+      `UPDATE cocina SET estado=$1 WHERE pedido_id=$2`,
+      [estado, id]
+    );
+
+    res.json(pedido.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al actualizar estado del pedido' });
+  }
+});
+
+// Pedidos marcados como 'Listo' en la tabla pedidos
+app.get('/cocina/pedidos-listos', async (req, res) => {
+  try {
+    const q = await pool.query(`
+      SELECT p.id, p.mesa, p.fecha, p.estado,
+             json_agg(json_build_object('nombre', r.nombre, 'cantidad', dp.cantidad)) AS recetas
+      FROM pedidos p
+      JOIN detalle_pedido dp ON p.id = dp.pedido_id
+      JOIN recetas r ON dp.receta_id = r.id
+      WHERE p.estado = 'Listo'
+      GROUP BY p.id, p.mesa, p.fecha, p.estado
+      ORDER BY p.fecha DESC
+    `);
+    res.json(q.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener pedidos listos' });
+  }
+});
+
+
 
 
   

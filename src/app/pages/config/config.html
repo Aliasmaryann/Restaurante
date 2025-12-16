@@ -1,0 +1,155 @@
+<div class="min-h-screen bg-gray-50">
+
+<header class="sticky top-0 z-30 bg-white border-b border-gray-200">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-blue-900">Gestión de Usuarios</h1>
+      <nav class="flex gap-4">
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/admin/dashboard">Finanzas</a>
+        <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/bodega-page">Bodega</a>
+      </nav>
+    </div>
+  </header>
+<p-card class="mx-auto max-w-7xl mt-2 px-4 py-6">
+<!-- Metricas -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white border rounded-lg p-4">
+    <p class="text-xs text-gray-500 uppercase">Usuarios activos</p>
+    <p class="text-2xl font-semibold">{{ stats.activos }}</p>
+  </div>
+  <div class="bg-white border rounded-lg p-4">
+    <p class="text-xs text-gray-500 uppercase">Administradores</p>
+    <p class="text-2xl font-semibold">{{ stats.admins }}</p>
+  </div>
+  <div class="bg-white border rounded-lg p-4">
+    <p class="text-xs text-gray-500 uppercase">Usuarios bloqueados</p>
+    <p class="text-2xl font-semibold text-red-600">{{ stats.bloqueados }}</p>
+  </div>
+  <div class="bg-white border rounded-lg p-4">
+    <p class="text-xs text-gray-500 uppercase">Último acceso</p>
+    <p class="text-sm">{{ stats.ultimoAcceso }}</p>
+  </div>
+</section>
+</p-card>
+<p-card class="mx-auto max-w-7xl mt-2 px-4 py-6">
+<!-- Gestión -->
+<div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
+    <div class="flex items-center gap-2">
+       <i class="pi pi-user text-gray-700"></i>
+       <span class="text-xl font-medium text-blue-900">Usuarios</span>
+   </div>
+   
+   <div class="flex gap-2">
+      <span class="p-input-icon-left w-full md:w-72">
+        <p-iconfield>
+            <input
+            pInputText
+            type="text"
+            class="w-full"
+            placeholder="Buscar Usuario"/>
+            <p-inputicon class="pi pi-search" />
+        </p-iconfield>
+        </span>
+    <p-button label="Nuevo Usuario" icon="pi pi-user-plus" severity="success"></p-button>
+    <p-button  label="Desactivar" icon="pi pi-lock" severity="warn"
+      [disabled]="selectedUsers.length === 0"></p-button>
+    <p-button  label="Eliminar" icon="pi pi-trash" severity="danger"
+      [disabled]="selectedUsers.length === 0"></p-button>
+  </div>
+</div>
+
+<p-table
+  [value]="usuarios"
+  [(selection)]="selectedUsers"
+  dataKey="id"
+  [paginator]="true"
+  [rows]="10"
+  responsiveLayout="scroll"
+  class="shadow-sm"
+>
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 3rem">
+        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+      </th>
+      <th>Nombre</th>
+      <th>Email</th>
+      <th>Rol</th>
+      <th>Estado</th>
+      <th>Último acceso</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-user>
+    <tr>
+      <td>
+        <p-tableCheckbox [value]="user"></p-tableCheckbox>
+      </td>
+      <td class="font-medium">{{ user.nombre }}</td>
+      <td>{{ user.email }}</td>
+      <td>
+        <p-tag [value]="user.rol" severity="info"></p-tag>
+      </td>
+      <td>
+        <p-tag
+          [value]="user.activo ? 'Activo' : 'Bloqueado'"
+          [severity]="user.activo ? 'success' : 'danger'">
+        </p-tag>
+      </td>
+      <td>{{ user.ultimo_login | date:'dd/MM/yyyy HH:mm' }}</td>
+      <td>
+        <button pButton icon="pi pi-pencil" text></button>
+        <button pButton icon="pi pi-key" text></button>
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>
+</p-card>
+<p-dialog header="Usuario" [(visible)]="mostrarDialog" [modal]="true" [style]="{width:'35vw'}">
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="text-sm font-medium">Nombre</label>
+      <input pInputText [(ngModel)]="usuario.nombre" class="w-full" />
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Email</label>
+      <input pInputText [(ngModel)]="usuario.email" class="w-full" />
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Rol</label>
+      <select [(ngModel)]="usuario.rol" class="w-full border p-2 rounded">
+        <option value="Administrador">Administrador</option>
+        <option value="Cocina">Cocina</option>
+        <option value="Bodega">Bodega</option>
+        <option value="Finanzas">Finanzas</option>
+        <option value="Cliente">Cliente</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Estado</label>
+      <input type="checkbox" [(ngModel)]="usuario.activo" class="scale-125" />
+
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2 mt-6">
+    <button pButton label="Guardar" icon="pi pi-check" severity="success"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" severity="secondary"></button>
+  </div>
+</p-dialog>
+<footer>
+    <div class="mt-6 bg-blue-50 border border-blue-200 p-4 rounded">
+        <p class="text-sm text-blue-800">
+            💡 El sistema cuenta con control de accesos por rol, registro de actividad y
+            opciones de soporte para el administrador.
+        </p>
+    </div>
+</footer>
+
+</div>

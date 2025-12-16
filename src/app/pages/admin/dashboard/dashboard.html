@@ -1,11 +1,11 @@
+<div class="min-h-screen bg-gray-50">
+
 <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
       <div class="w-full px-4 py-3 flex items-center justify-between">
         <h1 class="text-2xl font-semibold text-blue-900">Gestión de Finanzas</h1>
         <nav class="flex gap-4">
-          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/admin/dashboard">Dashboard</a>
-          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/productos">Productos</a>
-          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/cocina">Cocina</a>
-          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/configuracion">Configuración</a>
+          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/bodega-page">Bodega</a>
+          <a class="text-sm text-gray-600 hover:text-gray-900" routerLink="/config">Configuración</a>
         </nav>
       </div>
   </header>
@@ -87,9 +87,44 @@
   <!-- Tabla de movimientos -->
   <div class="col-span-12">
     <p-card header="Movimientos financieros" class="shadow-lg">
-      <p-table [value]="movimientos" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+      <div class="flex flex-1 md:flex-none mb-4 mt-4 items-center gap-3">
+        <span class="p-input-icon-left w-full md:w-72">
+          <p-iconfield>
+            <input
+              pInputText
+              type="text"
+              class="w-full"
+              placeholder="Buscar Producto"/>
+            <p-inputicon class="pi pi-search" />
+          </p-iconfield>
+        </span>
+        <button
+          pButton
+          type="button"
+          label="Agregar"
+          icon="pi pi-plus"
+          class=""
+          (click)="abrirDialogoFinanzas()"
+          severity="success"      
+        ></button>
+        <button pButton 
+          label="Eliminar" 
+          icon="pi pi-trash" 
+          severity="danger" 
+          (click)="eliminarMovimientos()"></button>
+        <button pButton 
+          label="Editar" 
+          icon="pi pi-pencil" 
+          severity="secondary"
+          (click)="abrirDialogoEditarFinanzas()"></button>
+        
+      </div>
+      <p-table [value]="movimientos" [paginator]="true" [rows]="5" [resizableColumns]="true" [showGridlines]="true" responsiveLayout="scroll">
         <ng-template pTemplate="header">
           <tr>
+            <th style="width: 4rem">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th>
             <th>Fecha</th>
             <th>Tipo</th>
             <th>Descripción</th>
@@ -99,6 +134,9 @@
         </ng-template>
         <ng-template pTemplate="body" let-mov>
           <tr>
+            <td>
+                <p-tableCheckbox ></p-tableCheckbox>
+              </td>
             <td>{{ mov.fecha }}</td>
             <td>
               <p-tag [value]="mov.tipo" [severity]="mov.tipo === 'Ingreso' ? 'success' : 'danger'"></p-tag>
